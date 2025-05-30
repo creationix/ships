@@ -62,8 +62,8 @@ function Ship(index, hue) {
     updateMenu(time, delta) {
       const mx = Math.round(window.innerWidth / 4 * (iy + 0.5));
       const my = Math.round(window.innerHeight / 3 * (ix - 0.5));
-      const targetX = window.innerWidth / 2 + Math.sin(time / 2) * 200;
-      const targetY = window.innerHeight / 2 + Math.cos(time / 2) * 200;
+      const targetX = window.innerWidth / 2 + Math.sin(time / 2) * 400;
+      const targetY = window.innerHeight / 2 + Math.cos(time / 2) * 400;
 
       const angle = Math.atan2(targetY - my, targetX - mx) * 180 / Math.PI;
       // const angle = time * 10;

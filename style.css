@@ -19,12 +19,6 @@ body {
   display: block;
 }
 
-.glow {
-  display: block;
-  filter: blur(3px);
-  opacity: 0.2;
-}
-
 .trail {
   width: 0px;
   height: 0px;
