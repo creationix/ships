@@ -3,6 +3,16 @@ import { domBuilder } from "./dombuilder.js"
 /**
  * Ship renderer class for handling ship graphics and animations
  */
+// Load ship sprite sheet
+let shipImage = null;
+const loadShipImage = () => {
+  if (!shipImage) {
+    shipImage = new Image();
+    shipImage.src = './ships2.png';
+  }
+  return shipImage;
+};
+
 export function ShipRenderer(index, hue) {
   const ix = index % 4
   const iy = Math.floor(index / 4);
@@ -25,6 +35,9 @@ export function ShipRenderer(index, hue) {
     t.x = -10
     t.y = -10
   }
+  
+  // Load sprite image
+  const spriteImage = loadShipImage();
 
   return {
     start() {
@@ -118,6 +131,21 @@ export function ShipRenderer(index, hue) {
     // Get ship hue for identification
     getHue() {
       return hue;
+    },
+    
+    // Render ship on canvas (for game mode)
+    renderShip(ctx, x, y, scale = 1) {
+      if (!spriteImage.complete) return; // Wait for image to load
+      
+      const size = 128 * scale;
+      const halfSize = size / 2;
+      
+      // Draw ship sprite from sprite sheet
+      ctx.drawImage(
+        spriteImage,
+        ix * 128, iy * 128, 128, 128, // source rectangle
+        -halfSize, -halfSize, size, size // destination rectangle
+      );
     }
   }
 }

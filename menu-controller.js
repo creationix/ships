@@ -360,12 +360,41 @@ export class MenuController {
   
   startGame() {
     console.log('Starting game with players:', Array.from(this.players.keys()));
-    // TODO: Transition to game mode
-    // For now, just stop countdown
     this.stopCountdown();
+    
+    // Trigger game start callback if provided
+    if (this.onGameStart) {
+      this.onGameStart(Array.from(this.players.values()));
+    }
+  }
+  
+  setGameStartCallback(callback) {
+    this.onGameStart = callback;
   }
   
   getPlayers() {
     return Array.from(this.players.values());
+  }
+  
+  cleanup() {
+    // Stop countdown
+    this.stopCountdown();
+    
+    // Remove welcome message
+    if (this.welcomeElement && this.welcomeElement.parentNode) {
+      this.welcomeElement.parentNode.removeChild(this.welcomeElement);
+    }
+    
+    // Clean up all player renderers and labels
+    for (const [playerId, player] of this.players) {
+      if (player.renderer) {
+        player.renderer.stop();
+      }
+      if (player.labelElement && player.labelElement.parentNode) {
+        player.labelElement.parentNode.removeChild(player.labelElement);
+      }
+    }
+    
+    this.players.clear();
   }
 }
