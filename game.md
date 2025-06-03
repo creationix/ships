@@ -6,9 +6,9 @@ Each player has a single joystick and two buttons to keep things simple.
 
 ## Keyboard Left
 
-- WASD for arrows
-- C for primary button
-- V for secondary button
+- `W` `A` `S` `D` for arrows
+- `C` for primary button
+- `V` for secondary button
 
 ## Keyboard Right
 
@@ -19,8 +19,8 @@ Each player has a single joystick and two buttons to keep things simple.
 ## Gamepads
 
 - Left joystick or D-Pad for arrows
-- `A` for primary button
-- `B` for secondary button
+- A for primary button
+- B for secondary button
 
 # Ship Select Menu
 
