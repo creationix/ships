@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Input Testbed</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #111;
+            color: #eee;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .controller {
+            background: #222;
+            margin: 1em auto;
+            padding: 1em;
+            border-radius: 8px;
+            max-width: 500px;
+            box-shadow: 0 2px 8px #0008;
+        }
+
+        .controller h2 {
+            margin: 0 0 0.5em 0;
+        }
+
+        .events {
+            font-size: 0.95em;
+            background: #181818;
+            padding: 0.5em;
+            border-radius: 4px;
+            height: 120px;
+            overflow-y: auto;
+            margin-bottom: 0.5em;
+        }
+
+        .state {
+            font-family: monospace;
+            font-size: 1em;
+            background: #181818;
+            padding: 0.5em;
+            border-radius: 4px;
+        }
+
+        .inactive {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 style="text-align:center;">Input Testbed</h1>
+    <div id="controllers"></div>
+    <script type="module">
+        import { inputManager } from './input.js';
+
+        const controllersDiv = document.getElementById('controllers');
+        const controllerUIs = new Map();
+
+        function createControllerUI(ctrl) {
+            const div = document.createElement('div');
+            div.className = 'controller';
+            div.innerHTML = `<h2>${ctrl.label}</h2>
+        <div class="events"></div>
+        <div class="state"></div>`;
+            controllersDiv.appendChild(div);
+            const eventsDiv = div.querySelector('.events');
+            const stateDiv = div.querySelector('.state');
+            function logEvent(ev) {
+                const time = new Date().toLocaleTimeString();
+                eventsDiv.innerHTML = `<div>[${time}] <b>${ev}</b></div>` + eventsDiv.innerHTML;
+                // Limit to 20 events
+                const lines = eventsDiv.innerHTML.split('<div>');
+                if (lines.length > 21) eventsDiv.innerHTML = lines.slice(0, 21).join('<div>');
+            }
+            // Listen for all events
+            for (const ev of ['left', 'right', 'up', 'down', 'primary', 'secondary']) {
+                ctrl.on(ev, () => logEvent(ev));
+            }
+            // Poll state
+            function updateState() {
+                const s = ctrl.getStatus();
+                stateDiv.textContent = `x: ${s.x.toFixed(2)}  y: ${s.y.toFixed(2)}  primary: ${s.primary}  secondary: ${s.secondary}`;
+                div.classList.toggle('inactive', !ctrl.active);
+            }
+            controllerUIs.set(ctrl, { div, updateState });
+            updateState();
+        }
+
+        function removeControllerUI(ctrl) {
+            const ui = controllerUIs.get(ctrl);
+            if (ui) {
+                ui.div.remove();
+                controllerUIs.delete(ctrl);
+            }
+        }
+
+        // Listen for controller add/remove
+        inputManager.on('controller_added', ctrl => {
+            createControllerUI(ctrl);
+        });
+        inputManager.on('controller_removed', ctrl => {
+            removeControllerUI(ctrl);
+        });
+
+        // Add UI for already-active controllers (e.g. gamepads on refresh)
+        for (const ctrl of inputManager.getControllers()) {
+            createControllerUI(ctrl);
+        }
+
+        // Animation loop
+        function loop() {
+            inputManager.poll();
+            for (const [ctrl, ui] of controllerUIs.entries()) {
+                ui.updateState();
+            }
+            requestAnimationFrame(loop);
+        }
+        loop();
+
+        // Instructions
+        const info = document.createElement('div');
+        info.style.textAlign = 'center';
+        info.style.margin = '1em auto';
+        info.innerHTML = `
+      <p>Connect a gamepad or press <b>WASD/C/V</b> or <b>Arrow keys/&lt;/&gt;</b> to activate a keyboard controller.<br>
+      Events and real-time state will appear below for each controller.</p>
+    `;
+        document.body.insertBefore(info, controllersDiv);
+    </script>
+</body>
+
+</html>

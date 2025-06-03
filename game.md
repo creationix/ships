@@ -4,6 +4,28 @@ Ship Joy is controlled by keyboard and/or gamepad for up to 6 players at once.
 
 Each player has a single joystick and two buttons to keep things simple.
 
+When in menu mode, input is event based (button press, arrow press, etc), but when in game mode, input is state pressed (current axis position from -1.0 to 1.0, button is pressed or button is not pressed etc).
+
+The input abstraction needs to support both kinds of interactions.
+
+## Input API Interface
+
+- events are fired to listeners when they happen
+  - on `left`
+  - on `right`
+  - on `up`
+  - on `down`
+  - on `primary` button press
+  - on `secondary` button press
+- realtime status is also available for the game loop
+  - status `x` -1.0 to 1.0
+  - status `y` -1.0 to 1.0
+  - status `primary` boolean for pressed
+  - status `secondary` boolean for pressed
+- global lifecycle events
+  - new controller added
+  - controller removed
+
 ## Keyboard Left
 
 - `W` `A` `S` `D` for arrows
