@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ship Renderer Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        body {
+            background: #000;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .label {
+            color: #fff;
+            font-family: sans-serif;
+            font-size: 1.2em;
+            text-align: center;
+            margin-top: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="label">Ship Renderer Demo: One in <b>cloud</b> mode, one in <b>follow</b> mode</div>
+    <script type="module">
+        import { ShipRenderer } from './ship.js';
+        // Pick two random ships
+        const w = window.innerWidth, h = window.innerHeight;
+        const time0 = Date.now() / 1000;
+        // Cloud mode ship
+        const ship1 = new ShipRenderer(Math.floor(Math.random() * 16));
+        ship1.attach(document.body);
+        // Follow mode ship
+        const ship2 = new ShipRenderer(Math.floor(Math.random() * 16));
+        ship2.attach(document.body);
+        // Initial positions
+        let x2 = w / 2, y2 = h / 2, angle2 = 0, vx2 = 2, vy2 = 1.5;
+        let mode1 = 'cloud', mode2 = 'follow';
+        let lastSwap = Date.now();
+        function animate() {
+            const time = Date.now() / 1000 - time0;
+            // Swap modes every 3 seconds
+            if (Date.now() - lastSwap > 3000) {
+                [mode1, mode2] = [mode2, mode1];
+                lastSwap = Date.now();
+            }
+            // Cloud mode: float in a circle
+            const cx = w / 2 + Math.cos(time / 2) * w / 4;
+            const cy = h / 2 + Math.sin(time / 2) * h / 6;
+            ship1.update({ x: cx, y: cy, angle: time * 30, mode: mode1, time });
+            // Follow mode: bounce around
+            x2 += vx2; y2 += vy2;
+            if (x2 < 100 || x2 > w - 100) vx2 *= -1;
+            if (y2 < 100 || y2 > h - 100) vy2 *= -1;
+            angle2 += 2 + Math.sin(time) * 2;
+            ship2.update({ x: x2, y: y2, angle: angle2, mode: mode2, time });
+            requestAnimationFrame(animate);
+        }
+        animate();
+        window.addEventListener('resize', () => location.reload());
+    </script>
+</body>
+
+</html>
