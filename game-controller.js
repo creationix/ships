@@ -19,36 +19,10 @@ export class GameController {
   constructor(inputManager, players) {
     this.inputManager = inputManager;
     this.players = new Map();
-    this.canvas = null;
-    this.ctx = null;
     this.statusElements = new Map();
     
-    this.initializeCanvas();
     this.initializePlayers(players);
     this.createStatusDisplay();
-  }
-  
-  initializeCanvas() {
-    // Create main game canvas
-    this.canvas = domBuilder(['canvas', {
-      width: window.innerWidth,
-      height: window.innerHeight,
-      style: {
-        position: 'absolute',
-        top: '0',
-        left: '0',
-        background: 'black',
-        zIndex: '1'
-      }
-    }]);
-    document.body.appendChild(this.canvas);
-    this.ctx = this.canvas.getContext('2d');
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-      this.canvas.width = window.innerWidth;
-      this.canvas.height = window.innerHeight;
-    });
   }
   
   initializePlayers(menuPlayers) {
@@ -80,6 +54,9 @@ export class GameController {
         // Renderer
         renderer: new ShipRenderer(menuPlayer.currentShip.ship, menuPlayer.currentShip.hue)
       };
+      
+      // Start the DOM-based renderer
+      gamePlayer.renderer.start();
       
       this.players.set(menuPlayer.controllerId, gamePlayer);
     });
@@ -291,47 +268,21 @@ export class GameController {
   }
   
   render(time) {
-    // Clear canvas
-    this.ctx.fillStyle = 'black';
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    
-    // Render each player's ship
+    // Render each player's ship using DOM-based rendering
     for (const [playerId, player] of this.players) {
       this.renderShip(player, time);
     }
   }
   
   renderShip(player, time) {
-    this.ctx.save();
+    // Convert angle from radians to degrees
+    const angleDegrees = player.angle * 180 / Math.PI;
     
-    // Move to ship position
-    this.ctx.translate(player.x, player.y);
-    this.ctx.rotate(player.angle);
+    // Check if thrusting and has power
+    const isThrusting = (player.isThrusting || player.isReversing) && player.power > 0;
     
-    // Render ship sprite
-    player.renderer.renderShip(this.ctx, 0, 0, 1);
-    
-    // Render thrust particles if thrusting
-    if ((player.isThrusting || player.isReversing) && player.power > 0) {
-      this.renderThrustParticles(player, time);
-    }
-    
-    this.ctx.restore();
-  }
-  
-  renderThrustParticles(player, time) {
-    const particleCount = 5;
-    const thrustLength = player.isThrusting ? 30 : 15;
-    
-    for (let i = 0; i < particleCount; i++) {
-      const offset = (Math.sin(time * 10 + i) * 0.5 + 0.5) * thrustLength;
-      const spread = (Math.sin(time * 8 + i * 2) * 0.5 + 0.5) * 10 - 5;
-      
-      this.ctx.fillStyle = `hsl(${30 + Math.sin(time * 15 + i) * 30}, 100%, ${50 + offset}%)`;
-      this.ctx.beginPath();
-      this.ctx.arc(spread, 20 + offset, 2, 0, Math.PI * 2);
-      this.ctx.fill();
-    }
+    // Update ship using the flying renderer
+    player.renderer.renderFlying(player.x, player.y, angleDegrees, isThrusting, time);
   }
   
   updateStatusDisplay() {
@@ -360,21 +311,17 @@ export class GameController {
   }
   
   cleanup() {
-    // Remove canvas and status elements
-    if (this.canvas && this.canvas.parentNode) {
-      this.canvas.parentNode.removeChild(this.canvas);
-    }
-    
-    const statusContainer = document.querySelector('.status-container');
-    if (statusContainer && statusContainer.parentNode) {
-      statusContainer.parentNode.removeChild(statusContainer);
-    }
-    
-    // Stop all player renderers
+    // Remove ship renderers
     for (const [playerId, player] of this.players) {
       if (player.renderer) {
         player.renderer.stop();
       }
+    }
+    
+    // Remove status elements
+    const statusContainer = document.querySelector('.status-container');
+    if (statusContainer && statusContainer.parentNode) {
+      statusContainer.parentNode.removeChild(statusContainer);
     }
   }
 }

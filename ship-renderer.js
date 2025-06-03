@@ -66,6 +66,42 @@ export function ShipRenderer(index, hue) {
       shipElement.style.transform = `translate(${x - 64}px, ${y - 64}px) rotate(${rotationAngle + 90}deg)`;
     },
     
+    // Render ship in flying game mode with thrust trail
+    renderFlying(x, y, rotationAngle, isThrusting, time) {
+      this.moveTo(x, y, rotationAngle);
+      
+      if (isThrusting) {
+        // Add new trail particle at ship's rear
+        const rearAngle = (rotationAngle + 180) * Math.PI / 180;
+        const rearX = x + Math.cos(rearAngle) * 50;
+        const rearY = y + Math.sin(rearAngle) * 50;
+        
+        // Update trail particles
+        trail[-1] = { x: rearX, y: rearY };
+        
+        for (let i = trail.length - 1; i >= 0; i--) {
+          const t = trail[i];
+          let prev = trail[i - 1] || trail[-1];
+          t.x = prev.x;
+          t.y = prev.y;
+          const alpha = (1 - i / trail.length) * 0.8;
+          const sat = 100;
+          t.style.boxShadow = `0px 0px 6px 6px hsla(${hue}deg, ${sat}%, 50%, ${alpha})`;
+          t.style.transform = `translate(${t.x - 3}px, ${t.y - 3}px)`;
+        }
+      } else {
+        // Fade out trail when not thrusting
+        for (let i = 0; i < trail.length; i++) {
+          const t = trail[i];
+          const alpha = Math.max(0, (1 - i / trail.length) * 0.3); // Dimmer when not thrusting
+          t.style.boxShadow = `0px 0px 3px 3px hsla(${hue}deg, 50%, 30%, ${alpha})`;
+          if (alpha <= 0) {
+            t.style.transform = `translate(-10px, -10px)`; // Hide completely faded particles
+          }
+        }
+      }
+    },
+    
     // Render ship in cycling/selecting state (slowly rotating)
     renderCycling(x, y, time) {
       const rotationAngle = time * 30; // slow rotation
