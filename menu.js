@@ -29,19 +29,19 @@ export class MenuNavigator {
     const canMove = time - cursor.lastMoveTime > this.moveDelay;
     
     // Check for movement input (with deadzone and timing)
-    if (canMove && (gamepadManager.isButtonJustPressed(gamepadIndex, 14) || leftStickX < -0.5)) { // Left
+    if (canMove && (gamepadManager.wasButtonJustPressed(gamepadIndex, 14) || leftStickX < -0.5)) { // Left
       cursor.x = Math.max(0, cursor.x - 1);
       cursor.lastMoveTime = time;
     }
-    if (canMove && (gamepadManager.isButtonJustPressed(gamepadIndex, 15) || leftStickX > 0.5)) { // Right
+    if (canMove && (gamepadManager.wasButtonJustPressed(gamepadIndex, 15) || leftStickX > 0.5)) { // Right
       cursor.x = Math.min(this.gridWidth - 1, cursor.x + 1);
       cursor.lastMoveTime = time;
     }
-    if (canMove && (gamepadManager.isButtonJustPressed(gamepadIndex, 12) || leftStickY < -0.5)) { // Up
+    if (canMove && (gamepadManager.wasButtonJustPressed(gamepadIndex, 12) || leftStickY < -0.5)) { // Up
       cursor.y = Math.max(0, cursor.y - 1);
       cursor.lastMoveTime = time;
     }
-    if (canMove && (gamepadManager.isButtonJustPressed(gamepadIndex, 13) || leftStickY > 0.5)) { // Down
+    if (canMove && (gamepadManager.wasButtonJustPressed(gamepadIndex, 13) || leftStickY > 0.5)) { // Down
       cursor.y = Math.min(this.gridHeight - 1, cursor.y + 1);
       cursor.lastMoveTime = time;
     }
@@ -50,7 +50,7 @@ export class MenuNavigator {
     const shipIndex = cursor.y * this.gridWidth + cursor.x;
     
     // Handle selection
-    if (gamepadManager.isButtonJustPressed(gamepadIndex, 0)) { // A button
+    if (gamepadManager.wasButtonJustPressed(gamepadIndex, 0)) { // A button
       if (!gameState.isShipSelected(shipIndex)) {
         // Select this ship
         if (cursor.selectedShip !== null) {
@@ -72,7 +72,7 @@ export class MenuNavigator {
     }
     
     // Handle ready/start
-    if (gamepadManager.isButtonJustPressed(gamepadIndex, 9)) { // Start button
+    if (gamepadManager.wasButtonJustPressed(gamepadIndex, 9)) { // Start button
       if (cursor.selectedShip !== null) {
         gameState.setPlayerReady(gamepadIndex, true);
         

@@ -56,15 +56,15 @@ export function updateUI(ui, mode, gamepadManager, gameState) {
     content += '<div><strong>GAME MODE</strong></div><br>';
     
     content += '<div><strong>Gamepad Controls:</strong></div>';
-    content += '<div>• Left stick: Thrust</div>';
-    content += '<div>• Right stick: Aim</div>';
-    content += '<div>• Right trigger: Thrust</div>';
+    content += '<div>• Left stick up: Thrust forward</div>';
+    content += '<div>• Left stick left/right: Rotate</div>';
+    content += '<div>• Left stick down: Thrust backward</div>';
     content += '<div>• SELECT: Return to menu</div><br>';
     
     content += '<div><strong>Keyboard Controls:</strong></div>';
-    content += '<div>• WASD: Thrust</div>';
-    content += '<div>• IJKL: Aim</div>';
-    content += '<div>• E: Thrust</div>';
+    content += '<div>• W: Thrust forward</div>';
+    content += '<div>• A/D: Rotate left/right</div>';
+    content += '<div>• S: Thrust backward</div>';
     content += '<div>• ESC: Return to menu</div>';
   }
   

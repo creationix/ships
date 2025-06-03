@@ -83,37 +83,26 @@ export class KeyboardFallback {
           }
         }
         
-        menuNavigator.updateHighlighting();
+        menuNavigator.updateHighlighting(sprites, gameState, colorPairs);
       }
     }
     
     return {
       getAxis: (index) => {
-        if (index === 0) { // Left stick X
+        if (index === 0) { // Left stick X (A/D for rotate left/right)
           if (this.keys.has('KeyA')) return -1;
           if (this.keys.has('KeyD')) return 1;
           return 0;
         }
-        if (index === 1) { // Left stick Y
+        if (index === 1) { // Left stick Y (W/S for thrust forward/back)
           if (this.keys.has('KeyW')) return -1;
           if (this.keys.has('KeyS')) return 1;
-          return 0;
-        }
-        if (index === 2) { // Right stick X
-          if (this.keys.has('KeyJ')) return -1;
-          if (this.keys.has('KeyL')) return 1;
-          return 0;
-        }
-        if (index === 3) { // Right stick Y
-          if (this.keys.has('KeyI')) return -1;
-          if (this.keys.has('KeyK')) return 1;
           return 0;
         }
         return 0;
       },
       isButtonPressed: (index) => {
-        if (index === 7) return this.keys.has('KeyE'); // Right trigger
-        return false;
+        return false; // No button controls needed for simplified scheme
       }
     };
   }

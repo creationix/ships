@@ -108,43 +108,44 @@ export function Ship(index, hue) {
     updateGame(time, delta, gamepadManager, keyboardFallback, mode) {
       if (controlledByPlayer !== null) {
         // Player-controlled ship
-        let leftStickX, leftStickY, rightStickX, rightStickY, rightTrigger;
+        let upInput, downInput, leftInput, rightInput;
         
         if (controlledByPlayer === 99) {
           // Keyboard control
           const kb = keyboardFallback.simulateGamepad(time);
-          leftStickX = kb.getAxis(0);
-          leftStickY = kb.getAxis(1);
-          rightStickX = kb.getAxis(2);
-          rightStickY = kb.getAxis(3);
-          rightTrigger = kb.isButtonPressed(7) ? 1 : 0;
+          upInput = kb.getAxis(1) < -0.5 ? 1 : 0;      // W key
+          downInput = kb.getAxis(1) > 0.5 ? 1 : 0;     // S key  
+          leftInput = kb.getAxis(0) < -0.5 ? 1 : 0;    // A key
+          rightInput = kb.getAxis(0) > 0.5 ? 1 : 0;    // D key
         } else {
-          // Gamepad control
-          leftStickX = gamepadManager.getAxis(controlledByPlayer, 0);
-          leftStickY = gamepadManager.getAxis(controlledByPlayer, 1);
-          rightStickX = gamepadManager.getAxis(controlledByPlayer, 2);
-          rightStickY = gamepadManager.getAxis(controlledByPlayer, 3);
-          rightTrigger = gamepadManager.isButtonPressed(controlledByPlayer, 7) ? 1 : 0;
-        }
-        
-        // Use right stick for rotation, left stick for thrust direction
-        if (Math.abs(rightStickX) > 0.1 || Math.abs(rightStickY) > 0.1) {
-          angle = Math.atan2(rightStickY, rightStickX) * 180 / Math.PI;
-        }
-        
-        // Thrust with left stick or right trigger
-        const thrustInput = Math.sqrt(leftStickX * leftStickX + leftStickY * leftStickY);
-        
-        const thrustAmount = Math.max(thrustInput, rightTrigger);
-        
-        if (thrustAmount > 0.1) {
-          let thrustAngle = angle;
-          if (thrustInput > 0.1) {
-            thrustAngle = Math.atan2(leftStickY, leftStickX) * 180 / Math.PI;
-          }
+          // Gamepad control - use left stick or D-pad
+          const stickX = gamepadManager.getAxis(controlledByPlayer, 0);
+          const stickY = gamepadManager.getAxis(controlledByPlayer, 1);
           
-          velocityX += thrust * Math.cos(thrustAngle * Math.PI / 180) * delta * thrustAmount;
-          velocityY += thrust * Math.sin(thrustAngle * Math.PI / 180) * delta * thrustAmount;
+          upInput = stickY < -0.5 ? 1 : 0;
+          downInput = stickY > 0.5 ? 1 : 0;
+          leftInput = stickX < -0.5 ? 1 : 0;
+          rightInput = stickX > 0.5 ? 1 : 0;
+        }
+        
+        // Rotation controls
+        if (leftInput) {
+          angle -= 180 * delta; // Rotate left
+        }
+        if (rightInput) {
+          angle += 180 * delta; // Rotate right
+        }
+        
+        // Thrust controls
+        if (upInput) {
+          // Forward thrust
+          velocityX += thrust * Math.cos(angle * Math.PI / 180) * delta;
+          velocityY += thrust * Math.sin(angle * Math.PI / 180) * delta;
+        }
+        if (downInput) {
+          // Backward thrust/brake
+          velocityX -= thrust * Math.cos(angle * Math.PI / 180) * delta * 0.7;
+          velocityY -= thrust * Math.sin(angle * Math.PI / 180) * delta * 0.7;
         }
         
         // Apply drag
@@ -195,8 +196,20 @@ export function Ship(index, hue) {
       }
     },
     update(time, delta, mode, gamepadManager, keyboardFallback) {
-      if (mode === 'MENU') return this.updateMenu(time, delta);
-      return this.updateGame(time, delta, gamepadManager, keyboardFallback, mode);
+      if (mode === 'MENU') {
+        // Show all ships in menu mode
+        element.style.display = 'block';
+        return this.updateMenu(time, delta);
+      } else {
+        // In game mode, only show player-controlled ships
+        if (controlledByPlayer !== null) {
+          element.style.display = 'block';
+          return this.updateGame(time, delta, gamepadManager, keyboardFallback, mode);
+        } else {
+          element.style.display = 'none';
+          return;
+        }
+      }
     }
   }
 }

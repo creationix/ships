@@ -65,7 +65,7 @@ function animate() {
     // Handle game mode input
     const connectedGamepads = gamepadManager.getConnectedGamepads();
     for (const gamepad of connectedGamepads) {
-      if (gamepadManager.isButtonJustPressed(gamepad.index, 8)) { // Select button
+      if (gamepadManager.wasButtonJustPressed(gamepad.index, 8)) { // Select button
         mode = 'MENU';
         // Reset game state
         for (const sprite of sprites) {
@@ -90,6 +90,22 @@ function animate() {
       gameState.players.clear();
       gameState.selectedShips.clear();
       menuNavigator.cursors.clear();
+    }
+    
+    // Handle gamepad return to menu
+    for (const gamepadIndex of gamepadManager.getConnectedGamepads().map(gp => gp.index)) {
+      if (gamepadManager.wasButtonJustPressed(gamepadIndex, 8)) { // SELECT button
+        mode = 'MENU';
+        // Reset game state
+        for (const sprite of sprites) {
+          sprite.setControlledByPlayer(null);
+          sprite.setSelected(false);
+        }
+        gameState.players.clear();
+        gameState.selectedShips.clear();
+        menuNavigator.cursors.clear();
+        break;
+      }
     }
   }
   
