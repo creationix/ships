@@ -149,9 +149,9 @@ class InputManager {
             let y = (s.down ? 1 : 0) + (s.up ? -1 : 0);
             // Normalize if both x and y are nonzero
             if (x && y) {
-                const scale = 1 / Math.sqrt(2);
-                x *= scale;
-                y *= scale;
+                const dist = Math.sqrt(2);
+                x /= dist
+                y /= dist;
             }
             ctrl.updateState({
                 x, y,
@@ -174,14 +174,11 @@ class InputManager {
             if (pad.buttons[GAMEPAD_BUTTONS.dpad_right]?.pressed) x = 1;
             if (pad.buttons[GAMEPAD_BUTTONS.dpad_up]?.pressed) y = -1;
             if (pad.buttons[GAMEPAD_BUTTONS.dpad_down]?.pressed) y = 1;
-            // Normalize if both x and y are nonzero
-            if (x && y) {
-                const scale = 1 / Math.sqrt(2);
-                x *= scale;
-                y *= scale;
+            const dist = Math.sqrt(x * x + y * y)
+            if (dist > 1) {
+                x /= dist;
+                y /= dist;
             }
-            x = clamp(x, -1, 1);
-            y = clamp(y, -1, 1);
             ctrl.updateState({
                 x, y,
                 left: x < -0.5, right: x > 0.5, up: y < -0.5, down: y > 0.5,
