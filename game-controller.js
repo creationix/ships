@@ -221,20 +221,19 @@ export class GameController {
   handleInput() {
     for (const [playerId, player] of this.players) {
       const controller = this.inputManager.getController(playerId);
-      if (!controller) continue;
-      
-      // Get input states
-      const input = this.inputManager.getInput(playerId);
+      if (!controller || !controller.active) continue;
       
       // Rotation
-      player.isRotatingLeft = input.left;
-      player.isRotatingRight = input.right;
+      player.isRotatingLeft = controller.left || false;
+      player.isRotatingRight = controller.right || false;
       
       // Thrust
-      player.isThrusting = input.up;
-      player.isReversing = input.down;
+      player.isThrusting = controller.up || false;
+      player.isReversing = controller.down || false;
       
       // TODO: Handle primary/secondary buttons for blasters/shields
+      // player.isPrimaryPressed = controller.primaryPressed || false;
+      // player.isSecondaryPressed = controller.secondaryPressed || false;
     }
   }
   
