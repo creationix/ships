@@ -24,3 +24,10 @@ body {
   height: 0px;
   position: absolute;
 }
+
+.ui {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
