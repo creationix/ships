@@ -63,7 +63,7 @@ export function ShipRenderer(index, hue) {
       posX = x;
       posY = y;
       angle = rotationAngle;
-      shipElement.style.transform = `translate(${x - 64}px, ${y - 64}px) rotate(${rotationAngle + 90}deg)`;
+      shipElement.style.transform = `translate(${x - 64}px, ${y - 64}px) rotate(${rotationAngle}deg)`;
     },
     
     // Render ship in flying game mode with thrust trail
