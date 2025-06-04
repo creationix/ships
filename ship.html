@@ -43,10 +43,28 @@
         const ship2 = new ShipRenderer(pickRandomShipIndex());
         ship2.attach(document.body);
         // Add a ship that always points up in the center
-        const upShip = new ShipRenderer(pickRandomShipIndex()); // Use a visible ship index
+        const upShip = new ShipRenderer(pickRandomShipIndex());
         upShip.attach(document.body);
-        const rightShip = new ShipRenderer(pickRandomShipIndex()); // Use a visible ship index
+        const rightShip = new ShipRenderer(pickRandomShipIndex());
         rightShip.attach(document.body);
+
+        // Add labels for upShip and rightShip
+        function addLabel(text, x, y) {
+            const label = document.createElement('div');
+            label.textContent = text;
+            label.style.position = 'absolute';
+            label.style.left = `${x - 60}px`;
+            label.style.top = `${y - 90}px`;
+            label.style.width = '120px';
+            label.style.textAlign = 'center';
+            label.style.color = '#fff';
+            label.style.fontFamily = 'sans-serif';
+            label.style.fontSize = '1.1em';
+            label.style.pointerEvents = 'none';
+            document.body.appendChild(label);
+        }
+        addLabel('UP', w / 2, h / 2);
+        addLabel('RIGHT', w / 2 - 200, h / 2);
 
         // Initial positions
         let x2 = w / 2, y2 = h / 2, angle2 = 0, vx2 = 2, vy2 = 1.5;
