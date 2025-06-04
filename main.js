@@ -35,6 +35,7 @@ function addPlayer(ctrl) {
     ship,
     label: ctrl.label,
     selectionTime: 0,
+    ignoreFirstPress: true, // flag to ignore first input
   };
   players.push(player);
   layoutPlayers();
@@ -46,6 +47,21 @@ function removePlayer(ctrl) {
   if (idx !== -1) {
     shipsInUse.delete(players[idx].shipIndex);
     players[idx].ship.detach();
+    if (players[idx].labelDiv && players[idx].labelDiv.parentNode) {
+      players[idx].labelDiv.parentNode.removeChild(players[idx].labelDiv);
+      players[idx].labelDiv = null;
+    }
+    // Remove all event listeners from the controller
+    if (players[idx].ctrl && players[idx].ctrl.listeners) {
+      for (const key in players[idx].ctrl.listeners) {
+        players[idx].ctrl.listeners[key] = [];
+      }
+    }
+    // Remove the controller from inputManager.controllers so it can be re-added
+    const cidx = inputManager.controllers.indexOf(ctrl);
+    if (cidx !== -1) {
+      inputManager.controllers[cidx] = undefined;
+    }
     players.splice(idx, 1);
     layoutPlayers();
   }
@@ -53,7 +69,16 @@ function removePlayer(ctrl) {
 
 function setupPlayerInput(player) {
   const { ctrl } = player;
-  ctrl.on('left', () => {
+  function ignoreFirst(fn) {
+    return function(...args) {
+      if (player.ignoreFirstPress) {
+        player.ignoreFirstPress = false;
+        return;
+      }
+      fn(...args);
+    };
+  }
+  ctrl.on('left', ignoreFirst(() => {
     if (player.state !== 1) return;
     // Cycle left
     let cur = SHIP_OPTIONS.indexOf(player.shipIndex);
@@ -67,8 +92,8 @@ function setupPlayerInput(player) {
     player.ship = new ShipRenderer(player.shipIndex);
     player.ship.attach(document.body);
     layoutPlayers();
-  });
-  ctrl.on('right', () => {
+  }));
+  ctrl.on('right', ignoreFirst(() => {
     if (player.state !== 1) return;
     // Cycle right
     let cur = SHIP_OPTIONS.indexOf(player.shipIndex);
@@ -82,8 +107,8 @@ function setupPlayerInput(player) {
     player.ship = new ShipRenderer(player.shipIndex);
     player.ship.attach(document.body);
     layoutPlayers();
-  });
-  ctrl.on('primary', () => {
+  }));
+  ctrl.on('primary', ignoreFirst(() => {
     if (player.state === 1) {
       // Select ship
       player.state = 2;
@@ -94,8 +119,8 @@ function setupPlayerInput(player) {
       layoutPlayers();
       checkAllReady();
     }
-  });
-  ctrl.on('secondary', () => {
+  }));
+  ctrl.on('secondary', ignoreFirst(() => {
     if (player.state === 3) {
       // Back to selected
       player.state = 2;
@@ -108,36 +133,43 @@ function setupPlayerInput(player) {
       // Remove player
       removePlayer(ctrl);
     }
-  });
+  }));
 }
 
 function layoutPlayers() {
   // Remove all ships from DOM
   for (const p of players) p.ship.detach();
+  // Remove all labels from DOM
+  for (const p of players) {
+    if (p.labelDiv && p.labelDiv.parentNode) {
+      p.labelDiv.parentNode.removeChild(p.labelDiv);
+      p.labelDiv = null; // Fix: clear reference so new label can be created
+    }
+  }
   // Layout horizontally centered
   const w = window.innerWidth;
   const h = window.innerHeight;
   const n = players.length;
-  const rowY = h / 2;
-  const spacing = Math.min(220, w / (n + 1));
-  for (let i = 0; i < n; ++i) {
+  const rowY = h/2;
+  const spacing = Math.min(220, w/(n+1));
+  for (let i=0; i<n; ++i) {
     const p = players[i];
-    const x = w / 2 + (i - (n - 1) / 2) * spacing;
+    const x = w/2 + (i - (n-1)/2) * spacing;
     let mode = 'cloud';
     if (p.state === 2) mode = 'selected';
     if (p.state === 3) mode = 'ready';
     let angle = 0;
-    if (mode === 'cloud') angle = (performance.now() / 1000) * 30;
+    if (mode === 'cloud') angle = (performance.now()/1000)*30;
     if (mode === 'selected') angle = 0;
-    if (mode === 'ready') angle = Math.sin(performance.now() / 300) * 15;
-    p.ship.update({ x, y: rowY, angle, mode: (mode === 'cloud' ? 'cloud' : 'follow'), time: performance.now() / 1000 });
+    if (mode === 'ready') angle = Math.sin(performance.now()/300)*15;
+    p.ship.update({ x, y: rowY, angle, mode: (mode==='cloud'?'cloud':'follow'), time: performance.now()/1000 });
     p.ship.attach(document.body);
     // Add label
     if (!p.labelDiv) {
       p.labelDiv = document.createElement('div');
       p.labelDiv.style.position = 'absolute';
-      p.labelDiv.style.left = `${x - 80}px`;
-      p.labelDiv.style.top = `${rowY - 120}px`;
+      p.labelDiv.style.left = `${x-80}px`;
+      p.labelDiv.style.top = `${rowY-120}px`;
       p.labelDiv.style.width = '160px';
       p.labelDiv.style.textAlign = 'center';
       p.labelDiv.style.color = '#fff';
@@ -146,7 +178,13 @@ function layoutPlayers() {
       document.body.appendChild(p.labelDiv);
     }
     p.labelDiv.textContent = `${p.label} - ${MENU_STATES[p.state]}`;
-    p.labelDiv.style.left = `${x - 80}px`;
+    p.labelDiv.style.left = `${x-80}px`;
+  }
+  // Show welcome if no players
+  if (players.length === 0 && !document.body.contains(welcome)) {
+    document.body.appendChild(welcome);
+  } else if (players.length > 0 && document.body.contains(welcome)) {
+    welcome.parentNode.removeChild(welcome);
   }
 }
 

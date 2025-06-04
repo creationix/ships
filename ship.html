@@ -28,14 +28,26 @@
     <script type="module">
         import { ShipRenderer } from './ship.js';
         // Pick two random ships
+        function pickRandomShipIndex() {
+            while (true) {
+                const index = Math.floor(Math.random() * 16);
+                if (index % 4) return index
+            }
+        }
         const w = window.innerWidth, h = window.innerHeight;
         const time0 = Date.now() / 1000;
         // Cloud mode ship
-        const ship1 = new ShipRenderer(Math.floor(Math.random() * 16));
+        const ship1 = new ShipRenderer(pickRandomShipIndex());
         ship1.attach(document.body);
         // Follow mode ship
-        const ship2 = new ShipRenderer(Math.floor(Math.random() * 16));
+        const ship2 = new ShipRenderer(pickRandomShipIndex());
         ship2.attach(document.body);
+        // Add a ship that always points up in the center
+        const upShip = new ShipRenderer(pickRandomShipIndex()); // Use a visible ship index
+        upShip.attach(document.body);
+        const rightShip = new ShipRenderer(pickRandomShipIndex()); // Use a visible ship index
+        rightShip.attach(document.body);
+
         // Initial positions
         let x2 = w / 2, y2 = h / 2, angle2 = 0, vx2 = 2, vy2 = 1.5;
         let mode1 = 'cloud', mode2 = 'follow';
@@ -57,6 +69,8 @@
             if (y2 < 100 || y2 > h - 100) vy2 *= -1;
             angle2 += 2 + Math.sin(time) * 2;
             ship2.update({ x: x2, y: y2, angle: angle2, mode: mode2, time });
+            upShip.update({ x: w / 2, y: h / 2, angle: 0, mode: 'cloud', time });
+            rightShip.update({ x: w / 2 - 200, y: h / 2, angle: 90, mode: 'cloud', time });
             requestAnimationFrame(animate);
         }
         animate();

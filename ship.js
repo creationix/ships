@@ -4,30 +4,35 @@
 // ship.update({x, y, angle, mode, time, delta})
 
 const SHIP_SPRITES = [
-    { index: 1, hue: 150 }, // green-blue
-    { index: 2, hue: 0 }, // red
-    { index: 3, hue: 270 }, // purple
-    { index: 5, hue: 180 }, // teal
-    { index: 6, hue: 120 }, // green
-    { index: 7, hue: 30 }, // yellow-orange
-    { index: 9, hue: 190 }, // blue-green
-    { index: 10, hue: 330 }, // pink
-    { index: 11, hue: 210 }, // blue
-    { index: 13, hue: 90 }, // lime
-    { index: 14, hue: 20 }, // orange
-    { index: 15, hue: 50 }, // yellow
-    { index: 0, hue: 200 }, // fallback
-    { index: 4, hue: 80 },
-    { index: 8, hue: 300 },
-    { index: 12, hue: 40 },
+    {}, // placeholder for index 0
+    { hue: 150 }, // green-blue
+    { hue: 0 }, // red
+    { hue: 270 }, // purple
+    {},
+    { hue: 180 }, // teal
+    { hue: 120 }, // green
+    { hue: 30 }, // yellow-orange
+    {},
+    { hue: 190 }, // blue-green
+    { hue: 330 }, // pink
+    { hue: 210 }, // blue
+    {},
+    { hue: 90 }, // lime
+    { hue: 20 }, // orange
+    { hue: 50 }, // yellow
+
 ];
 
 const TRAIL_LENGTH = 100;
 
 export class ShipRenderer {
-    constructor(shipIndex, hue) {
-        this.shipIndex = shipIndex % 16;
-        this.hue = hue ?? SHIP_SPRITES[this.shipIndex]?.hue ?? 0;
+    constructor(shipIndex) {
+        const config = SHIP_SPRITES[shipIndex];
+        if (!config || typeof config.hue !== 'number') {
+            throw new Error(`Invalid ship index: ${shipIndex}`);
+        }
+        this.hue = config.hue
+        this.shipIndex = shipIndex
         const ix = this.shipIndex % 4;
         const iy = Math.floor(this.shipIndex / 4);
         this.spriteStyle = {
@@ -60,6 +65,7 @@ export class ShipRenderer {
         for (const t of this.trail) if (t.parentNode) t.parentNode.removeChild(t);
         if (this.root.parentNode) this.root.parentNode.removeChild(this.root);
     }
+    // Angle is in degrees, 0 is up, 90 is right, 180 is down, 270 is left
     update({ x, y, angle, mode, time, delta }) {
         this.x = x ?? this.x;
         this.y = y ?? this.y;
@@ -68,7 +74,7 @@ export class ShipRenderer {
         this.time = time ?? this.time;
         this.delta = delta ?? this.delta;
         // Update ship position and rotation
-        this.root.style.transform = `translate(${this.x - 64}px, ${this.y - 64}px) rotate(${(this.angle ?? 0) + 90}deg)`;
+        this.root.style.transform = `translate(${this.x - 64}px, ${this.y - 64}px) rotate(${this.angle}deg)`;
         if (this.mode === 'cloud') {
             // Cloud mode: particles spin around the ship
             const radius = 100;
@@ -85,7 +91,7 @@ export class ShipRenderer {
             }
         } else if (this.mode === 'follow') {
             // Follow mode: trail follows ship's movement
-            this.trail[-1] = { x: this.x + Math.cos((this.angle + 180) * Math.PI / 180) * 50, y: this.y + Math.sin((this.angle + 180) * Math.PI / 180) * 50 };
+            this.trail[-1] = { x: this.x + Math.cos((this.angle + 90) * Math.PI / 180) * 50, y: this.y + Math.sin((this.angle + 90) * Math.PI / 180) * 50 };
             for (let i = this.trail.length - 1; i >= 0; i--) {
                 const t = this.trail[i];
                 let prev = this.trail[i - 1] || this.trail[-1];
