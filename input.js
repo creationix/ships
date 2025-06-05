@@ -5,7 +5,7 @@
  * Provides both event-based (menu) and state-based (game) APIs
  * 
  * Controller Lifecycle:
- * - Controllers activate on first input (first press is ignored)
+ * - Controllers activate only on key/button press events (not releases)
  * - Can be deactivated cleanly using controller.deactivate()
  * - Automatically reactivate on new input after deactivation
  * - Emits global events for controller add/remove
@@ -21,6 +21,7 @@
  * - Controllers expose only public methods: on(), off(), deactivate(), getStatus()
  * - Internal state management is encapsulated
  * - Proper lifecycle event handling without manual state manipulation
+ * - Key/button release events do not trigger controller activation
  */
 
 // Keyboard mappings: WASD+C/V (left) and arrows+,/. (right)
@@ -233,8 +234,8 @@ export function createInputManager() {
     keyboardStates[i][dir] = pressed;
 
     let ctrl = controllers[i];
-    if (!(ctrl && ctrl.active)) {
-      // Activate controller on first input
+    if (!(ctrl && ctrl.active) && pressed) {
+      // Only activate controller on key press, not key release
       const label = i === 0 ? 'Keyboard Left' : 'Keyboard Right';
       if (ctrl) {
         ctrl.active = true;
@@ -245,8 +246,10 @@ export function createInputManager() {
       ctrl = controllers[i]; // Update reference
     }
 
-    // Update controller state
-    updateKeyboardController(ctrl, i);
+    // Update controller state (but only if controller is active)
+    if (ctrl && ctrl.active) {
+      updateKeyboardController(ctrl, i);
+    }
     e.preventDefault();
   }
 
