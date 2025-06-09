@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Render.js Test</title>
+    <style>
+        /* Base styles */
+        body {
+            background: #181a20;
+            color: #e0e6ef;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #7fd1b9;
+            text-shadow: 0 2px 8px rgba(26, 42, 47, 0.5);
+            margin: 32px 0 16px;
+            text-align: center;
+        }
+
+        /* Container styles */
+        .menu-container {
+            background: #232634;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 32px 24px;
+        }
+
+        /* Welcome section */
+        .welcome-message h1 {
+            margin: 0 0 8px;
+            font-size: 2rem;
+        }
+
+        .welcome-message p {
+            color: #b3b9c9;
+            margin: 0 0 24px;
+            font-size: 1.1rem;
+        }
+
+        /* Player components */
+        .player-container {
+            display: flex;
+            align-items: center;
+            background: #23283b;
+            border-radius: 8px;
+            margin: 12px 0;
+            padding: 12px 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .player-label {
+            color: #f7c873;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        /* Player list */
+        .player-list {
+            background: #1e2330;
+            border-radius: 8px;
+            margin: 20px 0;
+            padding: 16px;
+            list-style: none;
+        }
+
+        .player-list li {
+            color: #a8b2d1;
+            padding: 6px 0;
+            border-bottom: 1px solid #2a2f42;
+        }
+
+        .player-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <h1>Render.js Test Page</h1>
+
+    <script type="module">
+        import { render } from './render.js';
+        // Render some simple HTML with inline styles and inline classes/id
+        // Pass in the data as JSON-ML
+        document.body.append(render([
+            ".menu-container",
+            [
+                ".welcome-message",
+                ["h1", "Welcome to Ship Joy!"],
+                ["p", "A game of space exploration and adventure."]
+            ],
+            [
+                ".player-container",
+                [
+                    "span.player-label",
+                    "Player 1"
+                ]
+            ],
+            [
+                ".player-container",
+                [
+                    "span.player-label",
+                    "Player 2"
+                ]
+            ],
+            ['ul.player-list',
+                [
+                    ['li', 'Player 1: Active'],
+                    ['li', 'Player 2: Inactive'],
+                    ['li', 'Player 3: Active']
+                ]
+            ]
+        ]));
+
+    </script>
+</body>
+
+</html>
