@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ship Joy - Templates</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        /* Hide all templates by default */
+        template {
+            display: none;
+        }
+
+        /* Base styles for when templates are cloned */
+        body {
+            background: #000;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Menu template styles */
+        .menu-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #001122 0%, #000000 100%);
+        }
+
+        .welcome-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #ffffff;
+            z-index: 10;
+        }
+
+        .welcome-message h1 {
+            font-size: 4em;
+            margin: 0 0 0.5em 0;
+            color: #00ccff;
+            text-shadow: 0 0 20px #00ccff;
+            font-weight: bold;
+        }
+
+        .welcome-message p {
+            font-size: 1.2em;
+            margin: 0.5em 0;
+            color: #cccccc;
+            text-shadow: 0 0 10px #ffffff;
+        }
+
+        .player-container {
+            position: relative;
+        }
+
+        .player-label {
+            color: #ffffff;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 10px #ffffff;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .countdown {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8em;
+            font-weight: bold;
+            color: #ff6600;
+            text-shadow: 0 0 30px #ff6600;
+            z-index: 20;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            color: #888;
+            font-size: 0.9em;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .instructions .controls {
+            display: inline-block;
+            margin: 0 1em;
+            padding: 0.5em;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .state-indicator {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #aaa;
+            text-align: center;
+        }
+
+        .state-cycling {
+            color: #ffcc00;
+        }
+
+        .state-selected {
+            color: #00ff00;
+        }
+
+        .state-ready {
+            color: #ff6600;
+        }
+
+        /* Ship modifications for menu states */
+        .ship.selected {
+            filter: drop-shadow(0 0 20px #00ff00);
+        }
+
+        .ship.ready {
+            filter: drop-shadow(0 0 20px #ff6600);
+        }
+
+        /* Ship demo styles */
+        .ship-demo-container {
+            background: #000;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .ship-label {
+            color: #fff;
+            font-family: sans-serif;
+            font-size: 1.1em;
+            text-align: center;
+            position: absolute;
+            width: 120px;
+            pointer-events: none;
+        }
+
+        /* Render demo styles */
+        .render-demo-container {
+            background: #181a20;
+            color: #e0e6ef;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .render-demo-container h1 {
+            color: #7fd1b9;
+            text-shadow: 0 2px 8px rgba(26, 42, 47, 0.5);
+            margin: 32px 0 16px;
+            text-align: center;
+        }
+
+        .render-menu-container {
+            background: #232634;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+            max-width: 480px;
+            margin: 40px auto;
+            padding: 32px 24px;
+        }
+
+        .render-welcome-message h1 {
+            margin: 0 0 8px;
+            font-size: 2rem;
+        }
+
+        .render-welcome-message p {
+            color: #b3b9c9;
+            margin: 0 0 24px;
+            font-size: 1.1rem;
+        }
+
+        .render-player-container {
+            display: flex;
+            align-items: center;
+            background: #23283b;
+            border-radius: 8px;
+            margin: 12px 0;
+            padding: 12px 18px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+        .render-player-label {
+            color: #f7c873;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .render-player-list {
+            background: #1e2330;
+            border-radius: 8px;
+            margin: 20px 0;
+            padding: 16px;
+            list-style: none;
+        }
+
+        .render-player-list li {
+            color: #a8b2d1;
+            padding: 6px 0;
+            border-bottom: 1px solid #2a2f42;
+        }
+
+        .render-player-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Menu Template -->
+    <template id="menu-template">
+        <div class="menu-container">
+            <div class="welcome-message">
+                <h1>Ship Joy</h1>
+                <p>Select your ship and prepare for battle!</p>
+            </div>
+
+            <div class="instructions">
+                <div class="controls">
+                    <strong>Keyboard Left:</strong> WASD + C/V
+                </div>
+                <div class="controls">
+                    <strong>Keyboard Right:</strong> Arrows + &lt;/&gt;
+                </div>
+                <div class="controls">
+                    <strong>Gamepad:</strong> D-Pad/Stick + A/B
+                </div>
+                <br>
+                <div style="margin-top: 10px;">
+                    <strong>Menu Controls:</strong>
+                    Left/Right to cycle ships | Primary button to select/ready | Secondary button to go back/exit
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Player Container Template -->
+    <template id="player-template">
+        <div class="player-container">
+            <div class="player-label">Player</div>
+            <div class="state-indicator">DEACTIVATED</div>
+        </div>
+    </template>
+
+    <!-- Countdown Template -->
+    <template id="countdown-template">
+        <div class="countdown">5</div>
+    </template>
+
+    <!-- Ship Demo Template -->
+    <template id="ship-demo-template">
+        <div class="ship-demo-container">
+            <div class="ship-label">Ship Renderer Demo</div>
+        </div>
+    </template>
+
+    <!-- Ship Label Template -->
+    <template id="ship-label-template">
+        <div class="ship-label"></div>
+    </template>
+
+    <!-- Game Start Message Template -->
+    <template id="game-start-template">
+        <div
+            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3em; color: #00ff00; text-shadow: 0 0 20px #00ff00; z-index: 30; text-align: center;">
+            GAME START!<br>
+            <small style="font-size: 0.5em;">Press F5 to return to menu</small>
+        </div>
+    </template>
+
+    <!-- Ship Component Template (for individual ships) -->
+    <template id="ship-component-template">
+        <div class="ship"></div>
+    </template>
+
+    <!-- Trail Component Template -->
+    <template id="trail-component-template">
+        <div class="trail"></div>
+    </template>
+
+    <script type="module">
+        import { createInputManager } from './input.js';
+        import { ShipRenderer } from './ship.js';
+
+        // Utility functions for template cloning
+        window.TemplateManager = {
+            clone: function (templateId) {
+                const template = document.getElementById(templateId);
+                if (!template) {
+                    console.error(`Template with id '${templateId}' not found`);
+                    return null;
+                }
+                return template.content.cloneNode(true);
+            },
+
+            cloneElement: function (templateId) {
+                const cloned = this.clone(templateId);
+                if (!cloned) return null;
+
+                // Return the first element child
+                const children = cloned.children;
+                return children.length > 0 ? children[0] : null;
+            },
+
+            // Helper to create multiple instances
+            cloneMultiple: function (templateId, count) {
+                const instances = [];
+                for (let i = 0; i < count; i++) {
+                    const instance = this.cloneElement(templateId);
+                    if (instance) instances.push(instance);
+                }
+                return instances;
+            },
+
+            // Get all available template IDs
+            getAvailableTemplates: function () {
+                return Array.from(document.querySelectorAll('template')).map(t => t.id);
+            }
+        };
+
+        // Available ship indices (skipping empty slots like in menu.js)
+        const AVAILABLE_SHIPS = [1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15];
+
+        // Simple helper functions
+        function randomShip(excludeShips = []) {
+            const available = AVAILABLE_SHIPS.filter(ship => !excludeShips.includes(ship));
+            return available[Math.floor(Math.random() * available.length)];
+        }
+
+        function createPlayer(controller) {
+            return {
+                controller,
+                state: 'cycling',
+                shipIndex: randomShip(),
+                readyOffset: Math.random() * Math.PI * 2
+            };
+        }
+
+        // Menu Manager using templates
+        class TemplateMenuManager {
+            constructor() {
+                this.players = new Map();
+                this.container = null;
+                this.countdownTimer = null;
+                this.countdownStartTime = null;
+                this.ships = new Map();
+                this.elements = new Map();
+                this.lastStructureHash = '';
+                this.inputManager = createInputManager();
+
+                this.setupInputListeners();
+                this.startAnimationLoop();
+            }
+
+            init(container) {
+                this.container = container;
+                this.renderAll();
+            }
+
+            // Check if we need to rebuild everything or just update animations
+            needsRebuild() {
+                const players = Array.from(this.players.values());
+                const currentHash = JSON.stringify({
+                    playerCount: players.length,
+                    ships: players.map(p => ({ id: p.controller.index, ship: p.shipIndex })),
+                    showCountdown: this.shouldShowCountdown()
+                });
+
+                if (currentHash !== this.lastStructureHash) {
+                    this.lastStructureHash = currentHash;
+                    return true;
+                }
+                return false;
+            }
+
+            // Rebuild the entire menu from scratch using templates
+            renderAll() {
+                // Clean up old ships
+                this.ships.forEach(ship => ship.detach());
+                this.ships.clear();
+                this.elements.clear();
+                this.container.innerHTML = '';
+
+                const players = Array.from(this.players.values());
+
+                if (players.length === 0) {
+                    this.showWelcomeMessage();
+                } else {
+                    this.showPlayers(players);
+                    if (this.shouldShowCountdown()) {
+                        this.showCountdown();
+                    }
+                }
+            }
+
+            showWelcomeMessage() {
+                const menuTemplate = window.TemplateManager.cloneElement('menu-template');
+                if (menuTemplate) {
+                    this.container.appendChild(menuTemplate);
+                    this.elements.set('menu', menuTemplate);
+                }
+            }
+
+            showPlayers(players) {
+                // Clone and append the base menu template
+                const menuTemplate = window.TemplateManager.cloneElement('menu-template');
+                if (menuTemplate) {
+                    // Update welcome message for player selection
+                    const welcomeMsg = menuTemplate.querySelector('.welcome-message');
+                    if (welcomeMsg) {
+                        welcomeMsg.innerHTML = `
+                            <h1>Ship Joy</h1>
+                            <p>Select your ships and get ready!</p>
+                        `;
+                    }
+                    this.container.appendChild(menuTemplate);
+                    this.elements.set('menu', menuTemplate);
+                }
+
+                const containerWidth = this.container.clientWidth;
+                const containerHeight = this.container.clientHeight;
+                const spacing = 200;
+                const totalWidth = (players.length - 1) * spacing;
+                const startX = (containerWidth - totalWidth) / 2;
+                const centerY = containerHeight / 2;
+
+                players.forEach((player, index) => {
+                    const x = startX + index * spacing;
+
+                    // Create player container from template
+                    const playerTemplate = window.TemplateManager.cloneElement('player-template');
+                    if (playerTemplate) {
+                        const label = playerTemplate.querySelector('.player-label');
+                        const stateIndicator = playerTemplate.querySelector('.state-indicator');
+
+                        if (label) {
+                            label.textContent = player.controller.label;
+                        }
+
+                        if (stateIndicator) {
+                            stateIndicator.textContent = player.state.toUpperCase();
+                            stateIndicator.className = `state-indicator state-${player.state}`;
+                        }
+
+                        // Position the player container
+                        playerTemplate.style.position = 'absolute';
+                        playerTemplate.style.left = `${x - 64}px`;
+                        playerTemplate.style.top = `${centerY - 150}px`;
+                        playerTemplate.style.width = '128px';
+
+                        this.container.appendChild(playerTemplate);
+                        this.elements.set(`player-${player.controller.index}`, playerTemplate);
+
+                        // Store reference to label for updates
+                        player.label = playerTemplate;
+                    }
+
+                    // Create ship
+                    const ship = new ShipRenderer(player.shipIndex);
+                    ship.attach(this.container);
+                    this.ships.set(player.controller.index, ship);
+
+                    // Store position for animation
+                    player.x = x;
+                    player.y = centerY;
+                });
+            }
+
+            showCountdown() {
+                const countdownTemplate = window.TemplateManager.cloneElement('countdown-template');
+                if (countdownTemplate) {
+                    countdownTemplate.textContent = this.getCountdownSeconds().toString();
+                    this.container.appendChild(countdownTemplate);
+                    this.elements.set('countdown', countdownTemplate);
+                }
+            }
+
+            // Simple animation update - just move ships
+            updateAnimations() {
+                if (this.needsRebuild()) {
+                    this.renderAll();
+                    return;
+                }
+
+                // Update countdown if showing
+                if (this.shouldShowCountdown()) {
+                    const countdownEl = this.elements.get('countdown');
+                    if (countdownEl) {
+                        countdownEl.textContent = this.getCountdownSeconds().toString();
+                    }
+                }
+
+                // Update player state indicators
+                this.players.forEach(player => {
+                    if (player.label) {
+                        const stateIndicator = player.label.querySelector('.state-indicator');
+                        if (stateIndicator) {
+                            stateIndicator.textContent = player.state.toUpperCase();
+                            stateIndicator.className = `state-indicator state-${player.state}`;
+                        }
+                    }
+                });
+
+                // Update ship animations
+                const time = performance.now() / 1000;
+                this.players.forEach(player => {
+                    const ship = this.ships.get(player.controller.index);
+                    if (!ship || !player.x) return;
+
+                    let angle = 0;
+                    let mode = 'cloud';
+
+                    if (player.state === 'cycling') {
+                        angle = (time * 30) % 360; // rotate 30 degrees per second
+                    } else if (player.state === 'ready') {
+                        angle = Math.sin(time * 2 + player.readyOffset) * 15; // oscillate ±15 degrees
+                        mode = 'follow';
+                    }
+
+                    // Add visual class to ship based on state
+                    if (ship.root) {
+                        ship.root.classList.remove('selected', 'ready');
+                        if (player.state === 'selected') {
+                            ship.root.classList.add('selected');
+                        } else if (player.state === 'ready') {
+                            ship.root.classList.add('ready');
+                        }
+                    }
+
+                    ship.update({ x: player.x, y: player.y, angle, mode, time, delta: 0 });
+                });
+            }
+
+            shouldShowCountdown() {
+                const players = Array.from(this.players.values());
+                return players.length > 0 && players.every(p => p.state === 'ready');
+            }
+
+            getCountdownSeconds() {
+                if (!this.countdownStartTime) return 5;
+                const elapsed = Date.now() - this.countdownStartTime;
+                const remaining = Math.max(0, 5000 - elapsed);
+                return Math.ceil(remaining / 1000);
+            }
+
+            setupInputListeners() {
+                this.inputManager.on('controller_added', (controller) => {
+                    this.addPlayer(controller);
+                });
+
+                this.inputManager.on('controller_removed', (controller) => {
+                    this.removePlayer(controller.index);
+                });
+
+                // Poll gamepad input
+                const poll = () => {
+                    this.inputManager.poll();
+                    requestAnimationFrame(poll);
+                };
+                poll();
+            }
+
+            addPlayer(controller) {
+                if (this.players.has(controller.index)) {
+                    const player = this.players.get(controller.index);
+                    player.state = 'cycling';
+                    this.setupPlayerControls(player);
+                    return;
+                }
+
+                const player = createPlayer(controller);
+                this.players.set(controller.index, player);
+                this.setupPlayerControls(player);
+            }
+
+            removePlayer(controllerIndex) {
+                this.players.delete(controllerIndex);
+                this.checkCountdown();
+            }
+
+            setupPlayerControls(player) {
+                const controller = player.controller;
+
+                // Remove old listeners
+                controller.off('left', player.onLeft);
+                controller.off('right', player.onRight);
+                controller.off('primary', player.onPrimary);
+                controller.off('secondary', player.onSecondary);
+
+                // Add new listeners
+                player.onLeft = () => this.cycleShip(player, -1);
+                player.onRight = () => this.cycleShip(player, 1);
+                player.onPrimary = () => this.handlePrimary(player);
+                player.onSecondary = () => this.handleSecondary(player);
+
+                controller.on('left', player.onLeft);
+                controller.on('right', player.onRight);
+                controller.on('primary', player.onPrimary);
+                controller.on('secondary', player.onSecondary);
+            }
+
+            // Cycle through available ships (direction: -1 for left, 1 for right)
+            cycleShip(player, direction) {
+                if (player.state !== 'cycling') return;
+
+                const currentIndex = AVAILABLE_SHIPS.indexOf(player.shipIndex);
+                let newIndex = (currentIndex + direction + AVAILABLE_SHIPS.length) % AVAILABLE_SHIPS.length;
+
+                // Skip ships selected by other players
+                const selectedShips = Array.from(this.players.values())
+                    .filter(p => p !== player && (p.state === 'selected' || p.state === 'ready'))
+                    .map(p => p.shipIndex);
+
+                while (selectedShips.includes(AVAILABLE_SHIPS[newIndex])) {
+                    newIndex = (newIndex + direction + AVAILABLE_SHIPS.length) % AVAILABLE_SHIPS.length;
+                }
+
+                this.changeShip(player, AVAILABLE_SHIPS[newIndex]);
+            }
+
+            changeShip(player, newShipIndex) {
+                // Handle ship conflicts - bump other player if needed
+                const conflictPlayer = Array.from(this.players.values())
+                    .find(p => p !== player && p.shipIndex === newShipIndex &&
+                        (p.state === 'selected' || p.state === 'ready'));
+
+                if (conflictPlayer) {
+                    const excludeShips = Array.from(this.players.values())
+                        .filter(p => p !== conflictPlayer && (p.state === 'selected' || p.state === 'ready'))
+                        .map(p => p.shipIndex);
+                    excludeShips.push(newShipIndex);
+
+                    conflictPlayer.shipIndex = randomShip(excludeShips);
+                    conflictPlayer.state = 'cycling';
+                }
+
+                player.shipIndex = newShipIndex;
+            }
+
+            handlePrimary(player) {
+                if (player.state === 'cycling') {
+                    this.changeShip(player, player.shipIndex); // Handle conflicts
+                    player.state = 'selected';
+                } else if (player.state === 'selected') {
+                    player.state = 'ready';
+                    this.checkCountdown();
+                }
+            }
+
+            handleSecondary(player) {
+                if (player.state === 'cycling') {
+                    player.controller.deactivate();
+                } else if (player.state === 'selected') {
+                    player.state = 'cycling';
+                    this.checkCountdown();
+                } else if (player.state === 'ready') {
+                    player.state = 'selected';
+                    this.checkCountdown();
+                }
+            }
+
+            checkCountdown() {
+                if (this.shouldShowCountdown()) {
+                    this.startCountdown();
+                } else {
+                    this.stopCountdown();
+                }
+            }
+
+            startCountdown() {
+                if (this.countdownTimer) return;
+
+                this.countdownStartTime = Date.now();
+
+                const update = () => {
+                    const elapsed = Date.now() - this.countdownStartTime;
+                    if (elapsed >= 5000) {
+                        this.startGame();
+                    } else {
+                        this.countdownTimer = setTimeout(update, 100);
+                    }
+                };
+                update();
+            }
+
+            stopCountdown() {
+                if (this.countdownTimer) {
+                    clearTimeout(this.countdownTimer);
+                    this.countdownTimer = null;
+                }
+                this.countdownStartTime = null;
+            }
+
+            startGame() {
+                console.log('Starting game with players:', Array.from(this.players.values()));
+                this.stopCountdown();
+
+                // Show game start message using template
+                const gameStartTemplate = window.TemplateManager.cloneElement('game-start-template');
+                if (gameStartTemplate) {
+                    this.container.appendChild(gameStartTemplate);
+                    this.elements.set('gameStart', gameStartTemplate);
+                }
+            }
+
+            startAnimationLoop() {
+                const animate = () => {
+                    this.updateAnimations();
+                    requestAnimationFrame(animate);
+                };
+                requestAnimationFrame(animate);
+            }
+
+            destroy() {
+                this.stopCountdown();
+                this.ships.forEach(ship => ship.detach());
+                this.players.clear();
+                this.ships.clear();
+                this.elements.clear();
+                if (this.container) {
+                    this.container.innerHTML = '';
+                }
+            }
+        }
+
+        // Initialize the menu system
+        const menuManager = new TemplateMenuManager();
+        menuManager.init(document.body);
+
+        // Global access for debugging
+        window.menuManager = menuManager;
+        window.TemplateManager = window.TemplateManager;
+
+        // Example usage demonstration
+        console.log('Available templates:', window.TemplateManager.getAvailableTemplates());
+        console.log('Menu initialized with template system. Use controllers to join and navigate.');
+        console.log('Player states: cycling -> selected -> ready');
+        console.log('When all players are ready, a 5-second countdown will begin.');
+
+    </script>
+</body>
+
+</html>

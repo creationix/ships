@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Ship Joy - Main Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <style>
+        body {
+            background: #000;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+
+        .menu-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at center, #001122 0%, #000000 100%);
+        }
+
+        .welcome-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #ffffff;
+            z-index: 10;
+        }
+
+        .welcome-message h1 {
+            font-size: 4em;
+            margin: 0 0 0.5em 0;
+            color: #00ccff;
+            text-shadow: 0 0 20px #00ccff;
+            font-weight: bold;
+        }
+
+        .welcome-message p {
+            font-size: 1.2em;
+            margin: 0.5em 0;
+            color: #cccccc;
+            text-shadow: 0 0 10px #ffffff;
+        }
+
+        .player-container {
+            position: relative;
+        }
+
+        .player-label {
+            color: #ffffff;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 10px #ffffff;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .countdown {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 8em;
+            font-weight: bold;
+            color: #ff6600;
+            text-shadow: 0 0 30px #ff6600;
+            z-index: 20;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            color: #888;
+            font-size: 0.9em;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .instructions .controls {
+            display: inline-block;
+            margin: 0 1em;
+            padding: 0.5em;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .state-indicator {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #aaa;
+            text-align: center;
+        }
+
+        .state-cycling {
+            color: #ffcc00;
+        }
+
+        .state-selected {
+            color: #00ff00;
+        }
+
+        .state-ready {
+            color: #ff6600;
+        }
+
+        /* Ship modifications for menu states */
+        .ship.selected {
+            filter: drop-shadow(0 0 20px #00ff00);
+        }
+
+        .ship.ready {
+            filter: drop-shadow(0 0 20px #ff6600);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="menu-container" class="menu-container">
+        <!-- Menu content will be dynamically generated -->
+    </div>
+
+    <div class="instructions">
+        <div class="controls">
+            <strong>Keyboard Left:</strong> WASD + C/V
+        </div>
+        <div class="controls">
+            <strong>Keyboard Right:</strong> Arrows + &lt;/&gt;
+        </div>
+        <div class="controls">
+            <strong>Gamepad:</strong> D-Pad/Stick + A/B
+        </div>
+        <br>
+        <div style="margin-top: 10px;">
+            <strong>Menu Controls:</strong>
+            Left/Right to cycle ships | Primary button to select/ready | Secondary button to go back/exit
+        </div>
+    </div>
+
+    <script type="module">
+        import { MenuManager } from './menu.js';
+
+        // Initialize the menu
+        const menuContainer = document.getElementById('menu-container');
+        const menuManager = new MenuManager();
+        menuManager.init(menuContainer);
+
+        // Add visual state indicators for debugging
+        function addStateIndicators() {
+            const updateStateIndicators = () => {
+                // Remove existing indicators
+                document.querySelectorAll('.state-indicator').forEach(el => el.remove());
+
+                // Add new indicators for each player
+                for (const [index, player] of menuManager.players.entries()) {
+                    if (player.label) {
+                        const indicator = document.createElement('div');
+                        indicator.className = `state-indicator state-${player.state}`;
+                        indicator.textContent = player.state.toUpperCase();
+                        player.label.appendChild(indicator);
+
+                        // Add visual class to ship
+                        if (player.ship && player.ship.root) {
+                            player.ship.root.classList.remove('selected', 'ready');
+                            if (player.state === 'selected') {
+                                player.ship.root.classList.add('selected');
+                            } else if (player.state === 'ready') {
+                                player.ship.root.classList.add('ready');
+                            }
+                        }
+                    }
+                }
+
+                requestAnimationFrame(updateStateIndicators);
+            };
+
+            updateStateIndicators();
+        }
+
+        addStateIndicators();
+
+        // Handle game start event (when countdown completes)
+        const originalStartGame = menuManager.startGame.bind(menuManager);
+        menuManager.startGame = function () {
+            console.log('Game would start now with players:', Array.from(this.players.values()));
+
+            // Show game start message
+            const gameStartMsg = document.createElement('div');
+            gameStartMsg.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 3em;
+                color: #00ff00;
+                text-shadow: 0 0 20px #00ff00;
+                z-index: 30;
+                text-align: center;
+            `;
+            gameStartMsg.innerHTML = 'GAME START!<br><small style="font-size: 0.5em;">Press F5 to return to menu</small>';
+            document.body.appendChild(gameStartMsg);
+
+            // In a real game, this would transition to the game state
+            originalStartGame();
+        };
+
+        // Debug info
+        console.log('Menu initialized. Use controllers to join and navigate the ship selection menu.');
+        console.log('Player states: deactivated -> cycling -> selected -> ready');
+        console.log('When all players are ready, a 5-second countdown will begin.');
+
+        // Global access for debugging
+        window.menuManager = menuManager;
+    </script>
+</body>
+
+</html>
